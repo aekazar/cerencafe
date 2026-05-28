@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Katil Tavşan</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-image: url('bkg.png');
+      background-color: #f9f6ee;
+      font-family: "Comic Sans MS", "Segoe UI Rounded", "Arial Rounded MT Bold", cursive;
+      cursor: none;
+    }
+    #gameArea {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #rabbit {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-image: url('katil_tavsan.png');
+      background-size: cover;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .person {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background-image: url('adam.png');
+      background-size: cover;
+      transition: transform 0.2s ease;
+    }
+    #infoOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      font-size: 20px;
+      color: #111;
+    }
+
+    #startButton {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .blood {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #victoryOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 24px;
+      padding: 40px;
+    }
+
+    #backToGames {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #111;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <audio id="gameMusic">
+    <source src="tavsanmuzik.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="screamSound">
+    <source src="ahh.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="gameArea">
+    <div id="infoOverlay">
+      <div>
+        <h1>Merhaba Ceren Hanım, hoş geldiniz!</h1>
+        <p>Bu oyunda dışarıdan çok sevimli ve tatlı 🐰 ama aslında <strong>ölümcül ve şeytani</strong> 😈 bir Katil Tavşan'ı kontrol edeceksiniz.</p>
+        <p><strong>Amacınız:</strong> 35 zavallı insanı <em>öldürerek</em> menüyü ele geçirmek! 🍽️</p>
+        <p>İnsanları <strong>kovala</strong>, <strong>yakala</strong>, ve <strong>doğra</strong>! 💥</p>
+        <p>Mouse ile tavşanı yönlendirin... ve unutmayın:</p>
+        <p style="font-weight: bold; color: darkred;">Göründüğünüz kadar masum olmayın.</p>
+        <button id="startButton">Göreve Başla!</button>
+      </div>
+    </div>
+
+    <div id="rabbit"></div>
+
+   <div id="victoryOverlay">
+  <div>
+    <h1>Tebrikler Katil Tavşan!</h1>
+    <p>35 kişi katlettin ve menüye bir adım daha yaklaştın. 🐰🩸</p>
+    <p>Bakalım bir sonraki maceraya hazır mısın?</p>
+    <p style="margin-top: 10px; font-style: italic; color: darkred;">
+
+    </p>
+    <button id="backToGames">Oyunlara Dön</button>
+  </div>
+</div>
+    </div>
+  </div>
+
+  <script>
+    const rabbit = document.getElementById("rabbit");
+    const gameArea = document.getElementById("gameArea");
+    const screamSound = document.getElementById("screamSound");
+    const music = document.getElementById("gameMusic");
+    let score = 0;
+
+    document.addEventListener("mousemove", (e) => {
+      rabbit.style.left = (e.clientX - 40) + "px";
+      rabbit.style.top = (e.clientY - 40) + "px";
+    });
+
+    function movePerson(person) {
+      const moveInterval = setInterval(() => {
+        const x = parseFloat(person.style.left);
+        const y = parseFloat(person.style.top);
+        const dx = (Math.random() - 0.5) * 10;
+        const dy = (Math.random() - 0.5) * 10;
+
+        let newX = x + dx;
+        let newY = y + dy;
+
+        if (newX < -100 || newX > window.innerWidth + 100 || newY < -100 || newY > window.innerHeight + 100) {
+          clearInterval(moveInterval);
+          if (gameArea.contains(person)) gameArea.removeChild(person);
+          createPerson();
+        } else {
+          person.style.left = newX + "px";
+          person.style.top = newY + "px";
+        }
+      }, 50);
+    }
+
+    function createPerson() {
+      const person = document.createElement("div");
+      person.classList.add("person");
+      person.style.left = Math.random() * (window.innerWidth - 60) + "px";
+      person.style.top = Math.random() * (window.innerHeight - 60) + "px";
+      gameArea.appendChild(person);
+      movePerson(person);
+
+      person.addEventListener("click", () => {
+        if (gameArea.contains(person)) {
+          person.style.transform = "scale(0)";
+          playRandomScream();
+
+          const blood = document.createElement("img");
+          blood.src = "kan.png";
+          blood.style.position = "absolute";
+          blood.style.left = person.style.left;
+          blood.style.top = person.style.top;
+          blood.style.width = "100px";
+          blood.style.pointerEvents = "none";
+          blood.classList.add("blood");
+          gameArea.appendChild(blood);
+
+          setTimeout(() => { blood.style.opacity = 1; }, 10);
+          setTimeout(() => { gameArea.removeChild(blood); }, 1000);
+          setTimeout(() => gameArea.removeChild(person), 200);
+
+          score++;
+          if (score >= 35) {
+            document.getElementById("victoryOverlay").style.display = "flex";
+            rabbit.style.pointerEvents = "none";
+            document.querySelectorAll(".person").forEach(p => p.style.pointerEvents = "none");
+          } else {
+            createPerson();
+          }
+        }
+      });
+    }
+
+    for (let i = 0; i < 10; i++) createPerson();
+
+    document.getElementById("startButton").addEventListener("click", () => {
+      document.getElementById("infoOverlay").style.display = "none";
+      music.play();
+    });
+
+    document.getElementById("backToGames").addEventListener("click", () => {
+      window.location.href = "oyunlar2.html";
+    });
+
+    
+  const screamSounds = [
+    "ahh1.mp3",
+    "ahh2.mp3",
+    "uhh1.mp3",
+    "ciglik1.mp3"
+  ];
+
+  function playRandomScream() {
+    const randomSound = screamSounds[Math.floor(Math.random() * screamSounds.length)];
+    const audio = new Audio(randomSound);
+    audio.play();
+  }
+</script>
+  </script>
+</body>
+</html>

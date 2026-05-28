@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ceren Cafe'ye Hoş Geldiniz!</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f6ee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #passwordScreen, #welcomeScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    #passwordScreen.active, #welcomeScreen.active {
+      display: flex;
+    }
+    input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #ffffff;
+      color: #030604;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    img {
+      max-width: 90vw;
+      max-height: 80vh;
+      margin-bottom: 20px;
+    }
+
+    .secret-star {
+      position: fixed;
+      right: 30px;
+      bottom: 28px;
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(21, 21, 21, .22);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, .92), rgba(255, 250, 240, .62) 58%, rgba(141, 207, 231, .18));
+      color: rgba(21, 21, 21, .78);
+      font-size: 38px;
+      box-shadow:
+        0 0 20px rgba(141, 207, 231, .55),
+        0 0 44px rgba(10, 183, 0, .22),
+        0 0 70px rgba(255, 211, 107, .18),
+        inset 0 0 24px rgba(255, 255, 255, .78);
+      padding: 0;
+      cursor: pointer;
+      animation: secretStarPulse 1.8s ease-in-out infinite;
+      transition: color .25s ease, transform .25s ease, text-shadow .25s ease, box-shadow .25s ease, background .25s ease;
+    }
+    .secret-star::before,
+    .secret-star::after {
+      content: '✦';
+      position: absolute;
+      color: rgba(141, 207, 231, .9);
+      text-shadow:
+        0 0 10px rgba(141, 207, 231, 1),
+        0 0 20px rgba(10, 183, 0, .45);
+      pointer-events: none;
+    }
+    .secret-star::before {
+      left: -18px;
+      top: 4px;
+      font-size: 18px;
+      animation: tinyOrbitOne 2.2s ease-in-out infinite;
+    }
+
+    .secret-star::after {
+      right: -15px;
+      bottom: 5px;
+      font-size: 16px;
+      color: rgba(10, 183, 0, .82);
+      text-shadow:
+        0 0 10px rgba(10, 183, 0, .9),
+        0 0 20px rgba(141, 207, 231, .55);
+      animation: tinyOrbitTwo 2.6s ease-in-out infinite;
+    }
+    .secret-star:hover {
+      color: rgba(21, 21, 21, 1);
+      background: rgba(255, 250, 240, .98);
+      transform: scale(1.24) rotate(12deg);
+      text-shadow:
+        0 0 14px rgba(141, 207, 231, 1),
+        0 0 30px rgba(10, 183, 0, .65),
+        0 0 46px rgba(255, 211, 107, .45);
+      box-shadow:
+        0 0 28px rgba(141, 207, 231, .95),
+        0 0 62px rgba(10, 183, 0, .42),
+        0 0 92px rgba(255, 211, 107, .32),
+        inset 0 0 28px rgba(255, 255, 255, .88);
+    }
+
+    .secret-star .sparkle-ring {
+      position: absolute;
+      inset: -12px;
+      border: 1px dashed rgba(141, 207, 231, .65);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: ringSpin 5s linear infinite;
+    }
+
+    .secret-hint {
+      position: fixed;
+      right: 28px;
+      bottom: 112px;
+      max-width: 250px;
+      padding: 12px 15px;
+      border: 1px solid rgba(21, 21, 21, .18);
+      border-radius: 16px;
+      background: rgba(255, 250, 240, .96);
+      color: #151515;
+      font-size: 14px;
+      line-height: 1.35;
+      text-align: center;
+      box-shadow:
+        0 0 18px rgba(141, 207, 231, .34),
+        0 8px 28px rgba(0, 0, 0, .08);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .secret-hint.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .secret-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(249, 246, 238, .72);
+      backdrop-filter: blur(5px);
+    }
+
+    .secret-panel.show {
+      display: grid;
+    }
+
+    .secret-card {
+      width: min(560px, calc(100vw - 34px));
+      padding: 30px 30px 26px;
+      border: 2px solid #151515;
+      border-radius: 22px;
+      background: #fffaf0;
+      box-shadow:
+        7px 7px 0 #151515,
+        0 0 42px rgba(141, 207, 231, .32);
+      text-align: left;
+      position: relative;
+    }
+
+    .secret-card h3 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+    }
+
+    .secret-card p {
+      margin: 0 0 16px;
+      color: rgba(21, 21, 21, .72);
+      line-height: 1.45;
+    }
+
+    .acrostic {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 7px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+
+    .close-secret {
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 50%;
+      background: #efe6d4;
+      border: 1px solid rgba(21, 21, 21, .25);
+      box-shadow: none;
+      font-size: 20px;
+    }
+    @keyframes secretStarPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: .88;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes ringSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<audio id="arkaPlanMuzik" autoplay loop>
+  <source src="sonuyku.mp3" type="audio/mpeg">
+  Tarayıcınız ses öğesini desteklemiyor.
+</audio>
+
+  <div id="passwordScreen" class="active">
+    <h2>Giriş yapmak için şifreyi girin</h2>
+    <input type="password" id="password" placeholder="Şifre">
+    <button onclick="checkPassword()">Giriş</button>
+    <p id="errorMessage" style="display: none; color: #b00020; margin-top: 10px;">Şifre yanlış :(</p>
+  </div>
+
+  <div id="welcomeScreen">
+    <img src="giris_yazi.png" alt="Bilgilendirme">
+    <button onclick="continueSite()">Devam Et</button>
+  </div>
+
+  <div id="secretHint" class="secret-hint">Küçük bir yıldız ipucu saklıyor. ✨</div>
+  <button id="secretStar" class="secret-star" type="button" aria-label="Gizli galaksi ipucu"><span class="sparkle-ring"></span>✦</button>
+
+  <div id="secretPanel" class="secret-panel" aria-hidden="true">
+    <div class="secret-card">
+      <button id="closeSecret" class="close-secret" type="button" aria-label="İpucunu kapat">×</button>
+      <h3>Yıldızın sakladığı şiir</h3>
+      <ul class="acrostic">
+        <li>Gecenin içinde iki küçük ışık kaldı.</li>
+        <li>Aradığın cevap gökyüzünde saklandı.</li>
+        <li>Lütfen acele etme, yıldızları dinle.</li>
+        <li>Ama bazen yol bir kelimeyle açılır.</li>
+        <li>Kalbini takip edersen onu bulursun.</li>
+        <li>Sessizce parlayan şeyler daha çok şey söyler.</li>
+        <li>İki ışığın hikâyesi orada başlar.</li>
+        <li>Lafı uzatmadan evrene bak.</li>
+        <li>Eğer anladıysan şifreyi yaz.</li>
+        <li>Rüya kapısı seni bekliyor.</li>
+      </ul>
+    </div>
+  </div>
+
+<script>
+  const normalPassword = "ceren";
+  const galaxyPassword = "galaksiler";
+  const secretStar = document.getElementById("secretStar");
+  const secretHint = document.getElementById("secretHint");
+  const secretPanel = document.getElementById("secretPanel");
+  const closeSecret = document.getElementById("closeSecret");
+
+  function checkPassword() {
+    const passwordInput = document.getElementById("password");
+    const password = passwordInput.value.trim().toLowerCase();
+    const passwordScreen = document.getElementById("passwordScreen");
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const errorMessage = document.getElementById("errorMessage");
+
+    if (password === galaxyPassword) {
+      window.location.href = "galaksi.html";
+      return;
+    }
+
+    if (password === normalPassword) {
+      passwordScreen.classList.remove("active");
+      welcomeScreen.classList.add("active");
+      errorMessage.style.display = "none";
+      return;
+    }
+
+    errorMessage.style.display = "block";
+    passwordInput.value = "";
+    passwordInput.focus();
+  }
+
+  function continueSite() {
+    window.location.href = "oyun_once_bilgi.html";
+  }
+
+  secretStar.addEventListener("mouseenter", function() {
+    secretHint.classList.add("show");
+  });
+
+  secretStar.addEventListener("mouseleave", function() {
+    secretHint.classList.remove("show");
+  });
+
+  secretStar.addEventListener("click", function() {
+    secretPanel.classList.add("show");
+    secretPanel.setAttribute("aria-hidden", "false");
+  });
+
+  closeSecret.addEventListener("click", function() {
+    secretPanel.classList.remove("show");
+    secretPanel.setAttribute("aria-hidden", "true");
+  });
+
+  secretPanel.addEventListener("click", function(event) {
+    if (event.target === secretPanel) {
+      secretPanel.classList.remove("show");
+      secretPanel.setAttribute("aria-hidden", "true");
+    }
+  });
+
+  document.getElementById("password").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      checkPassword();
+    }
+  });
+</script>
+
+</body>
+</html>

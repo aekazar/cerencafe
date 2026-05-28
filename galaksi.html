@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İki Işığın Hikâyesi</title>
+  <link rel="stylesheet" href="galaksistyle.css" />
+</head>
+<body>
+  <section id="startScreen" class="start-screen">
+    <div class="start-card">
+      <p class="start-kicker">İki ışığın hikâyesi</p>
+      <h1>Hazır olduğunda başlayacak.</h1>
+      <p class="start-note">Sesi ayarla ve sonra küçük ışığa dokun.</p>
+
+      <div class="start-orbit" aria-hidden="true">
+        <span class="orbit-dot orbit-dot-green"></span>
+        <span class="orbit-dot orbit-dot-blue"></span>
+      </div>
+
+      <label class="volume-control" for="musicVolume">
+        <span>Müzik sesi</span>
+        <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.28" />
+      </label>
+
+      <button id="startBtn" class="start-button" type="button">Başla ✨</button>
+    </div>
+  </section>
+  <main id="scene" class="scene intro-dark">
+    <div id="stars" class="stars" aria-hidden="true"></div>
+    <div id="vignette" class="vignette" aria-hidden="true"></div>
+
+    <section id="storyBox" class="story-box intro-story centered-story">
+      <div id="speakerLabel" class="speaker">????</div>
+      <p id="storyText"></p>
+    </section>
+
+    <section class="planet-stage hidden-at-start" id="planetStage" aria-hidden="true">
+      <div id="connectionLine" class="connection-line" aria-hidden="true"></div>
+      <img id="greenPlanet" class="planet planet-green" src="green_planet.png" alt="Yeşil gezegen" />
+      <img id="bluePlanet" class="planet planet-blue" src="blue_planet.png" alt="Mavi gri gezegen" />
+      <img id="mergedPlanet" class="planet planet-merged hidden" style="display: none;" src="merged_source.png" alt="Birleşmiş turkuaz gezegen" />
+    </section>
+    <div id="flash" class="flash full-screen-flash hidden" style="display: none;" aria-hidden="true"></div>
+    <div id="wishStars" class="wish-stars" aria-hidden="true"></div>
+
+    <section id="interaction" class="interaction hidden" style="display: none;">
+      <p class="prompt">Onları yaklaştırmak için bir şeyler söyle.</p>
+      <div id="loveReply" class="love-reply">Her kelime, iki uzak ışığın arasında bir köprü olur.</div>
+      <div class="input-row">
+        <input id="feelingInput" type="text" placeholder="Buraya hissettiğin şeyi yaz..." autocomplete="off" />
+        <button id="sendBtn">Gönder</button>
+      </div>
+      <div class="counter"><span id="count">0</span>/5</div>
+    </section>
+
+    <section id="mergedStory" class="merged-story hidden" style="display: none;">
+      <p id="mergedStoryText"></p>
+    </section>
+    <p id="planetHint" class="planet-hint hidden" style="display: none;">Yeni gezegene dokun...</p>
+
+    <section id="secretLetter" class="secret-letter hidden" style="display: none;">
+      <div class="letter-card">
+        <button id="closeLetter" class="close-letter" type="button" aria-label="Mektubu kapat">×</button>
+        <p class="letter-kicker"></p>
+        <h2>Ceren’e...</h2>
+        <p>
+          Bu evrende iki ışık varsa, biri senin bana fark ettirdiğin şeylerdir.
+          Bazen bir bakışın, bazen bir sesin, bazen de sadece varlığın bile
+          karanlık sandığım yerleri daha yumuşak yapıyor.
+        </p>
+        <p>
+          İyi ki doğdun. İyi ki ışığını benimle paylaştın. Seninle aynı gökyüzüne
+          bakabilmek, benim için bu hikâyenin en güzel mucizesi. İyi ki varsın💫💙.
+        </p>
+      </div>
+    </section>
+
+    <button id="nextArrow" class="next-arrow hidden" type="button" style="display: none;" aria-label="Sonraki bölüme geç">
+      <span class="arrow-stars" aria-hidden="true">✦ ✧ ✦</span>
+      <span class="arrow-mark" aria-hidden="true">→</span>
+    </button>
+  </main>
+
+
+  <audio id="beforeMusic" src="ilk.mp3" preload="auto" loop></audio>
+  <audio id="afterMusic" src="son.mp3" preload="auto" loop></audio>
+  <script src="galaksijs.js"></script>
+</body>
+</html>
